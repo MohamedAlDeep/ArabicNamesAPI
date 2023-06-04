@@ -5,11 +5,10 @@ const app = express()
 var fs = require('fs');
 
 const bodyParser = require('body-parser');
-const { constants } = require('buffer');
+let Uname = require('./names.json')
 
 // Variables
 const port = 3000
-
 
 // Some settings
 app.use( bodyParser.json() );
@@ -22,21 +21,26 @@ app.use(express.urlencoded())
 
 // Code
 
-app.get('/add', (req, res) => {
+app.post('/add', (req, res) => {
   const name = req.body.name
-  const data = {}
-  fs.writeFile('names.json')
+  let allObj = [
+    {...Uname},
+    {name: name}
+  ]
+  let data = JSON.stringify(allObj);
+  fs.writeFileSync('names.json', data);
+  res.redirect('/data')
 })
 
 app.get('/data', (req, res) => {
-    let n = 2
-      fs.readFile("names.json", "utf8", (data) => {
-        const newdata = JSON.stringify(data)
-        res.json(newdata)
+      fs.readFile('names.json', 'utf8', (error, data) => {
+        let newData = JSON.parse(data)
+        res.json(newData)
       })
 })
 
 // Server listening
 app.listen(port, () => {
+
   console.log(`App listening on port ${port}`)
 })
